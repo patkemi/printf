@@ -18,11 +18,6 @@
 */
 char *decimal_to_binary(int decimal)
 {
-	/* Disable Betty warnings for this function */
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wpedantic"
-    #pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-
 	char *binary = malloc(33 * sizeof(char));
 	int i = 0;
 
@@ -64,11 +59,6 @@ char *decimal_to_binary(int decimal)
 */
 int _printf(const char *format, ...)
 {
-	/* Disable Betty warnings for this function */
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wpedantic"
-    #pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-
 	char buffer[1024];
 	int buffer_index = 0;
 	int count = 0;
