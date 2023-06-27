@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 /**
- *Converts a decimal number to its binary representation.
+ *decimal_to_binary - Converts a decimal number to its binary representation.
  *The resulting binary string is dynamically allocated and must be freed by the caller.
  *
  *@param decimal The decimal number to convert.
@@ -36,9 +36,11 @@ char *decimal_to_binary(int decimal)
 	binary[i] = '\0';
 
 	int len = strlen(binary);
+
 	for (int j = 0; j < len / 2; j++)
 	{
 		char temp = binary[j];
+
 		binary[j] = binary[len - j - 1];
 		binary[len - j - 1] = temp;
 	}
@@ -59,6 +61,7 @@ int _printf(const char *format, ...)
 	int count = 0;
 
 	va_list args;
+
 	va_start(args, format);
 
 	while (*format)
@@ -91,6 +94,7 @@ int _printf(const char *format, ...)
 
 			/*Field width */
 			int width = 0;
+
 			if (*format >= '1' && *format <= '9')
 			{
 				width = *format - '0';
@@ -99,6 +103,7 @@ int _printf(const char *format, ...)
 
 			/*Precision */
 			int precision = -1;
+
 			if (*format == '.')
 			{
 				format++;
@@ -119,6 +124,7 @@ int _printf(const char *format, ...)
 				case 'c':
 					{
 						char c = (char) va_arg(args, int);
+
 						buffer[buffer_index++] = c;
 
 						count++;
