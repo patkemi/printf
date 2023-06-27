@@ -15,7 +15,7 @@
  */
 char *decimal_to_binary(int decimal)
 {
-	char*binary = malloc(33*sizeof(char));
+	char *binary = malloc(33 * sizeof(char));
 	int i = 0;
 
 	/**Handle the case of zero separately*/
