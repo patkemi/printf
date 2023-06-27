@@ -1,66 +1,64 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdarg.h>
+#include <stdlib.h>
+
+/**
+ * _printf - a function that produces output according to a format
+ *
+ * @format: a character string composed of zero or more directives
+ *
+ * Return: the number of characters printed (excluding the null byte)
+ */
 
 int _printf(const char *format, ...)
 {
-	va_list args;
-	va_start(args, format);
+    va_list args;
+    va_start(args, format);
 
-	int printed_chars = 0;
-	char current_char;
+    int round = 0;
 
-	while ((current_char = *format++))
-	{
-		if (current_char == '%')
-		{
-			current_char = *format++;
+    while (*format != '\0')
+    {
+        if (*format == '%')
+        {
+            format++;
 
-			if (current_char == 'c')
-			{
-				int value = va_arg(args, int);
-				putchar(value);
-				printed_chars++;
-			}
-			else if (current_char == 's')
-			{
-				char *value = va_arg(args, char *);
-				while (*value)
-				{
-					putchar(*value++);
-					printed_chars++;
-				}
-			}
-			else if (current_char == '%')
-			{
-				putchar('%');
-				printed_chars++;
-			}
-			else
-			{
-				putchar('%');
-				putchar(current_char);
-				printed_chars += 2;
-			}
-		}
-		else
-		{
-			putchar(current_char);
-			printed_chars++;
-		}
-	}
+            if (*format == '\0')
+                break;
 
-	va_end(args);
+            if (*format == '%')
+            {
+                write(1, "%", 1);
+                round++;
+            }
+            else if (*format == 'c')
+            {
+                char c = (char)va_arg(args, int);
+                write(1, &c, 1);
+                round++;
+            }
+            else if (*format == 's')
+            {
+                const char *s = va_arg(args, const char *);
+                int length = 0;
+                while (s[length] != '\0')
+                    length++;
 
-	return printed_chars;
-}
+                write(1, s, length);
+                round += length;
+            }
+        }
+        else
+        {
+            write(1, format, 1);
+            round++;
+        }
 
-int main(void)
-{
-	char character = 'A';
-	char *name = "John Doe";
+        format++;
+    }
 
-	int chars_printed = _printf("Character: %c\nString: %s\nPercentage: %%\n", character, name);
-	printf("Number of characters printed: %d\n", chars_printed);
+    va_end(args);
 
-	return 0;
+    return (round);
 }
