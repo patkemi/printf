@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 /**
-*decimal_to_binary - Converts a decimal 
+*decimal_to_binary - Converts a decimal
 *number to its binary representation.
 *The resulting binary string is dynamically
 *allocated and must be freed by the caller.
