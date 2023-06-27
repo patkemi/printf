@@ -15,15 +15,15 @@
  */
 char *decimal_to_binary(int decimal)
 {
-	char *binary = malloc(33* sizeof(char));
+	char * binary = malloc(33 * sizeof(char));
 	int i = 0;
 
 	/**Handle the case of zero separately*/
 	if (decimal == 0)
 	{
 		binary[i++] = '0';
-		binary[i] = '\0';	// Null-terminate the string
-		return binary;
+		binary[i] = '\0';
+		return (binary);
 	}
 
 	/**Convert decimal to binary */
@@ -33,9 +33,8 @@ char *decimal_to_binary(int decimal)
 		decimal = decimal / 2;
 	}
 
-	binary[i] = '\0';	// Null-terminate the string
+	binary[i] = '\0';
 
-	// Reverse the binary string
 	int len = strlen(binary);
 	for (int j = 0; j < len / 2; j++)
 	{
@@ -108,7 +107,7 @@ int _printf(const char *format, ...)
 					precision = 0;
 					while (*format >= '0' && *format <= '9')
 					{
-						precision = precision *10 + (*format - '0');
+						precision = precision * 10 + (*format - '0');
 						format++;
 					}
 				}
@@ -121,6 +120,7 @@ int _printf(const char *format, ...)
 					{
 						char c = (char) va_arg(args, int);
 						buffer[buffer_index++] = c;
+
 						count++;
 						break;
 					}
@@ -132,6 +132,7 @@ int _printf(const char *format, ...)
 							str = "(null)";
 
 						int str_length = strlen(str);
+
 						int available_space = sizeof(buffer) - buffer_index - 1;
 
 						if (!flag_left_align)
@@ -139,9 +140,11 @@ int _printf(const char *format, ...)
 							if (width > str_length)
 							{
 								int padding = width - str_length;
+
 								while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
 								{
 									buffer[buffer_index++] = ' ';
+
 									count++;
 								}
 							}
@@ -150,6 +153,7 @@ int _printf(const char *format, ...)
 						for (int i = 0; i < str_length; i++)
 						{
 							buffer[buffer_index++] = str[i];
+
 							count++;
 						}
 
@@ -158,6 +162,7 @@ int _printf(const char *format, ...)
 							if (width > str_length)
 							{
 								int padding = width - str_length;
+
 								while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
 								{
 									buffer[buffer_index++] = ' ';
@@ -173,6 +178,7 @@ int _printf(const char *format, ...)
 				case 'i':
 					{
 						int num = va_arg(args, int);
+
 						int printed;
 						if (precision != -1)
 						{
@@ -229,6 +235,7 @@ int _printf(const char *format, ...)
 				case 'o':
 					{
 						unsigned int num = va_arg(args, unsigned int);
+
 						int printed;
 						if (precision != -1)
 						{
@@ -285,6 +292,7 @@ int _printf(const char *format, ...)
 				case 'X':
 					{
 						unsigned int num = va_arg(args, unsigned int);
+
 						int printed;
 						if (precision != -1)
 						{
@@ -313,6 +321,7 @@ int _printf(const char *format, ...)
 				case 'b':
 					{
 						unsigned int num = va_arg(args, unsigned int);
+
 						char *binary = decimal_to_binary(num);
 						int printed;
 						if (precision != -1)
@@ -338,6 +347,7 @@ int _printf(const char *format, ...)
 							str = "(null)";
 
 						int str_length = strlen(str);
+
 						int available_space = sizeof(buffer) - buffer_index - 1;
 
 						if (!flag_left_align)
@@ -345,6 +355,7 @@ int _printf(const char *format, ...)
 							if (width > str_length)
 							{
 								int padding = width - str_length;
+
 								while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
 								{
 									buffer[buffer_index++] = ' ';
@@ -374,6 +385,7 @@ int _printf(const char *format, ...)
 							if (width > str_length)
 							{
 								int padding = width - str_length;
+
 								while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
 								{
 									buffer[buffer_index++] = ' ';
@@ -388,6 +400,7 @@ int _printf(const char *format, ...)
 				case 'p':
 					{
 						void *ptr = va_arg(args, void *);
+
 						int printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
 							"%#lx", (intptr_t) ptr);
 						buffer_index += printed;
@@ -402,6 +415,7 @@ int _printf(const char *format, ...)
 							str = "(null)";
 
 						int str_length = strlen(str);
+
 						int available_space = sizeof(buffer) - buffer_index - 1;
 
 						if (!flag_left_align)
@@ -409,6 +423,7 @@ int _printf(const char *format, ...)
 							if (width > str_length)
 							{
 								int padding = width - str_length;
+
 								while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
 								{
 									buffer[buffer_index++] = ' ';
@@ -428,6 +443,7 @@ int _printf(const char *format, ...)
 							if (width > str_length)
 							{
 								int padding = width - str_length;
+
 								while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
 								{
 									buffer[buffer_index++] = ' ';
@@ -442,10 +458,12 @@ int _printf(const char *format, ...)
 				case 'R':
 					{
 						char *str = va_arg(args, char *);
+
 						if (str == NULL)
 							str = "(null)";
 
 						int str_length = strlen(str);
+
 						int available_space = sizeof(buffer) - buffer_index - 1;
 
 						if (!flag_left_align)
@@ -453,6 +471,7 @@ int _printf(const char *format, ...)
 							if (width > str_length)
 							{
 								int padding = width - str_length;
+
 								while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
 								{
 									buffer[buffer_index++] = ' ';
@@ -477,6 +496,7 @@ int _printf(const char *format, ...)
 							if (width > str_length)
 							{
 								int padding = width - str_length;
+
 								while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
 								{
 									buffer[buffer_index++] = ' ';
@@ -492,7 +512,9 @@ int _printf(const char *format, ...)
 				default:
 					{
 						buffer[buffer_index++] = '%';
+
 						buffer[buffer_index++] = *format;
+
 						count += 2;
 						break;
 					}
@@ -503,6 +525,7 @@ int _printf(const char *format, ...)
 		else
 		{
 			buffer[buffer_index++] = *format;
+			
 			count++;
 			format++;
 		}
