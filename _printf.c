@@ -7,15 +7,15 @@
 #include <stdint.h>
 
 /**
- *decimal_to_binary - Converts a decimal 
- number to its binary representation.
- *The resulting binary string is dynamically
-  allocated and must be freed by the caller.
- *
- *@param decimal The decimal number to convert.
- *@return The binary representation of the decimal
-  number as a dynamically allocated string.
- */
+*decimal_to_binary - Converts a decimal 
+*number to its binary representation.
+*The resulting binary string is dynamically
+*allocated and must be freed by the caller.
+*
+*@param decimal The decimal number to convert.
+*@return The binary representation of the decimal
+*number as a dynamically allocated string.
+*/
 char *decimal_to_binary(int decimal)
 {
 	/* Disable Betty warnings for this function */
@@ -57,11 +57,11 @@ char *decimal_to_binary(int decimal)
 }
 
 /**
- *_printf - Custom implementation of printf function
- *@format: Format string
- *
- *Return: Number of characters printed (excluding the null byte used to end output to strings)
- */
+*_printf - Custom implementation of printf function
+*@format: Format string
+*
+*Return: Number of characters printed (excluding the null byte used to end output to strings)
+*/
 int _printf(const char *format, ...)
 {
 	/* Disable Betty warnings for this function */
