@@ -7,7 +7,7 @@
  * _printf - Custom implementation of printf function
  * @format: Format string
  *
- * Return: Number of characters printed (excluding the 
+ * Return: Number of characters printed (excluding the
  * null byte used to end output to strings)
  */
 int _printf(const char *format, ...)
@@ -465,6 +465,6 @@ int _printf(const char *format, ...)
 	if (buffer_index > 0)
 		write(1, buffer, buffer_index);
 
-	return count;
+	return (count);
 }
 
