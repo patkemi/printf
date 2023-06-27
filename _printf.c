@@ -1,375 +1,470 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #include <unistd.h>
 
-#define BUFFER_SIZE 1024
-
-/** * Custom printf function that writes formatted output to the
- *  standard output stream. 
- * @param format The format string containing directives and optional arguments. 
- * Conversion specifiers in the format string are replaced by the 
- * corresponding formatted values from the additional arguments.
- * The format string can also include optional flags, width,
- * precision, and length modifiers to control the formatting.
- * Unsupported or invalid format specifiers are treated as
- * ordinary characters and copied directly to the output.
- * @param ... Additional arguments to be formatted and printed. 
- * @return The number of characters printed (excluding the null
- *  byte used to end output to strings).
- *  If an error occurs, a negative value is returned. */
-
+/**
+ * _printf - Custom implementation of printf function
+ * @format: Format string
+ *
+ * Return: Number of characters printed (excluding the 
+ * null byte used to end output to strings)
+ */
 int _printf(const char *format, ...)
 {
-    va_list args;
-    va_start(args, format);
+	char buffer[1024];
+	int buffer_index = 0;
+	int count = 0;
 
-    char buffer[BUFFER_SIZE];
-    int count = 0;
-    int buffer_index = 0;
-    const char *ch;
+	va_list args;
+	va_start(args, format);
 
-    for (ch = format; *ch != '\0'; ++ch)
-     {
-        if (*ch == '%')
-         {
-            // Handle the conversion specifiers
-            int flag_plus = 0;
-            int flag_space = 0;
-            int flag_hash = 0;
-            int flag_zero = 0;
+	while (*format)
+	{
+		if (*format == '%')
+		{
+			format++;
+			if (*format == '\0')
+				break;
+			if (*format == '%')
+			{
+				buffer[buffer_index++] = '%';
+				count++;
+				format++;
+				continue;
+			}
 
-            // Process flags
-            while (1)
-             {
-                ++ch;
-                if (*ch == '+')
-                    flag_plus = 1;
-                else if (*ch == ' ')
-                    flag_space = 1;
-                else if (*ch == '#')
-                    flag_hash = 1;
-                else if (*ch == '0')
-                    flag_zero = 1;
-                else
-                    break;
-            }
+			int flag_zero_padding = 0;
+			int flag_left_align = 0;
 
-            // Handle the length modifiers
-            int length_modifier = 0;
-            while (1)
-             {
-                if (*ch == 'l' || *ch == 'h')
-                 {
-                    length_modifier = *ch;
-                    ++ch;
-                } else
-                 {
-                    break;
-                }
-            }
+			/* Check for flag characters */
+			while (*format == '0' || *format == '-')
+			{
+				if (*format == '0')
+					flag_zero_padding = 1;
+				else if (*format == '-')
+					flag_left_align = 1;
+				format++;
+			}
 
-            // Handle the conversion specifier
-            switch (*ch)
-             {
-            case 'c':
-             {
-                    char c = (char)va_arg(args, int);
-                    buffer[buffer_index++] = c;
-                    count++;
-                    break;
-            }
-            case 's':
-             {
-                    const char *str = va_arg(args, const char *);
-                    while (*str != '\0')
-                     {
-                        buffer[buffer_index++] = *str++;
-                        count++;
-                        if (buffer_index == BUFFER_SIZE - 1)
-                         {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    }
-                    break;
-            }
-            case 'S':
-             {
-                    const unsigned char *str = (const unsigned char *)va_arg(args, const char *);
-                    while (*str != '\0') 
-                    {
-                        if (*str < 32 || *str >= 127)
-                         {
-                            buffer[buffer_index++] = '\\';
-                            buffer[buffer_index++] = 'x';
-                            buffer[buffer_index++] = ((*str >> 4) < 10) ? ((*str >> 4) + '0') : ((*str >> 4) + 'A' - 10);
-                            buffer[buffer_index++] = ((*str & 0x0F) < 10) ? ((*str & 0x0F) + '0') : ((*str & 0x0F) + 'A' - 10);
-                            count += 4;
-                        } else 
-                        {
-                            buffer[buffer_index++] = *str;
-                            count++;
-                        }
-                        str++;
-                        if (buffer_index == BUFFER_SIZE - 1)
-                         {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    }
-                    break;
-            }
-            case 'p':
-            {
-                    void *ptr = va_arg(args, void *);
-                    int num_chars = sprintf(buffer + buffer_index, "%p", ptr);
-                    count += num_chars;
-                    buffer_index += num_chars;
-                    if (buffer_index >= BUFFER_SIZE - 1) 
-                    {
-                        write(STDOUT_FILENO, buffer, buffer_index);
-                        buffer_index = 0;
-                    }
-                    break;
-            }
-            case '%':
-                    buffer[buffer_index++] = '%';
-                    count++;
-                    if (buffer_index == BUFFER_SIZE - 1) 
-                    {
-                        write(STDOUT_FILENO, buffer, buffer_index);
-                        buffer_index = 0;
-                    }
-                    break;
-                
-            case 'd':
-            case 'i': 
-            {
-                    if (length_modifier == 'l') 
-                    {
-                        long num = va_arg(args, long);
-                        int num_chars = sprintf(buffer + buffer_index, "%+ld", num);
-                        if (flag_space && !flag_plus) {
-                            buffer[buffer_index] = (num >= 0) ? ' ' : '-';
-                            num_chars++;
-                        
-                    }
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1)
-                        {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else if (length_modifier == 'h') 
-                    {
-                        int num = (short)va_arg(args, int);
-                        int num_chars = sprintf(buffer + buffer_index, "%+hd", num);
-                        if (flag_space && !flag_plus) 
-                        {
-                            buffer[buffer_index] = (num >= 0) ? ' ' : '-';
-                            num_chars++;
-                        }
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1) {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else {
-                        int num = va_arg(args, int);
-                        int num_chars = sprintf(buffer + buffer_index, "%+d", num);
-                        if (flag_space && !flag_plus) {
-                            buffer[buffer_index] = (num >= 0) ? ' ' : '-';
-                            num_chars++;
-                        }
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1) {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    }
-                    break;
-            }
-            case 'u': 
-            {
-                    if (length_modifier == 'l') 
-                    {
-                        unsigned long num = va_arg(args, unsigned long);
-                        int num_chars = sprintf(buffer + buffer_index, "%lu", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1) 
-                        {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else if (length_modifier == 'h')
-                     {
-                        unsigned int num = (unsigned short)va_arg(args, int);
-                        int num_chars = sprintf(buffer + buffer_index, "%hu", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1)
-                         {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else
-                     {
-                        unsigned int num = va_arg(args, unsigned int);
-                        int num_chars = sprintf(buffer + buffer_index, "%u", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1) 
-                        {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    }
-                    break;
-            }
-            case 'o': 
-            {
-                    if (length_modifier == 'l') 
-                    {
-                        unsigned long num = va_arg(args, unsigned long);
-                        int num_chars = sprintf(buffer + buffer_index, "%#lo", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1) 
-                        {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else if (length_modifier == 'h') 
-                    {
-                        unsigned int num = (unsigned short)va_arg(args, int);
-                        int num_chars = sprintf(buffer + buffer_index, "%#ho", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1)
-                         {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else 
-                    {
-                        unsigned int num = va_arg(args, unsigned int);
-                        int num_chars = sprintf(buffer + buffer_index, "%#o", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1)
-                         {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    }
-                    break;
-            }
-            case 'x':
-             {
-                    if (length_modifier == 'l') 
-                    {
-                        unsigned long num = va_arg(args, unsigned long);
-                        int num_chars = sprintf(buffer + buffer_index, "%#lx", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1) 
-                        {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else if (length_modifier == 'h')
-                     {
-                        unsigned int num = (unsigned short)va_arg(args, int);
-                        int num_chars = sprintf(buffer + buffer_index, "%#hx", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1) {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else
-                     {
-                        unsigned int num = va_arg(args, unsigned int);
-                        int num_chars = sprintf(buffer + buffer_index, "%#x", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1) 
-                        {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    }
-                    break;
-            }
-            case 'X':
-            {
-                    if (length_modifier == 'l') 
-                    {
-                        unsigned long num = va_arg(args, unsigned long);
-                        int num_chars = sprintf(buffer + buffer_index, "%#lX", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1) 
-                        {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else if (length_modifier == 'h')
-                     {
-                        unsigned int num = (unsigned short)va_arg(args, int);
-                        int num_chars = sprintf(buffer + buffer_index, "%#hX", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1)
-                         {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    } else 
-                    {
-                        unsigned int num = va_arg(args, unsigned int);
-                        int num_chars = sprintf(buffer + buffer_index, "%#X", num);
-                        count += num_chars;
-                        buffer_index += num_chars;
-                        if (buffer_index >= BUFFER_SIZE - 1)
-                         {
-                            write(STDOUT_FILENO, buffer, buffer_index);
-                            buffer_index = 0;
-                        }
-                    }
-                    break;
-            }
-            default:
-                    buffer[buffer_index++] = *ch;
-                    count++;
-                    if (buffer_index == BUFFER_SIZE - 1) 
-                    {
-                        write(STDOUT_FILENO, buffer, buffer_index);
-                        buffer_index = 0;
-                    }
-        }
-        } else 
-        {
-            buffer[buffer_index++] = *ch;
-            count++;
-            if (buffer_index == BUFFER_SIZE - 1) 
-            {
-                write(STDOUT_FILENO, buffer, buffer_index);
-                buffer_index = 0;
-            }
-        }
-    }
+			/* Field width */
+			int width = 0;
+			if (*format >= '1' && *format <= '9')
+			{
+				width = *format - '0';
+				format++;
+			}
 
-    if (buffer_index > 0) 
-    {
-        write(STDOUT_FILENO, buffer, buffer_index);
-    }
+			/* Precision */
+			int precision = -1;
+			if (*format == '.')
+			{
+				format++;
+				if (*format >= '0' && *format <= '9')
+				{
+					precision = 0;
+					while (*format >= '0' && *format <= '9')
+					{
+						precision = precision * 10 + (*format - '0');
+						format++;
+					}
+				}
+			}
 
-    va_end(args);
+			/* Conversion specifier */
+			switch (*format)
+			{
+				case 'c':
+				{
+					char c = (char)va_arg(args, int);
+					buffer[buffer_index++] = c;
+					count++;
+					break;
+				}
+				case 's':
+				{
+					char *str = va_arg(args, char *);
+					if (str == NULL)
+						str = "(null)";
 
-    return count;
+					int str_length = strlen(str);
+					int available_space = sizeof(buffer) - buffer_index - 1;
+
+					if (!flag_left_align)
+					{
+						/* Padding with spaces */
+						if (width > str_length)
+						{
+							int padding = width - str_length;
+							while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
+							{
+								buffer[buffer_index++] = ' ';
+								count++;
+							}
+						}
+					}
+
+					for (int i = 0; i < str_length; i++)
+					{
+						buffer[buffer_index++] = str[i];
+						count++;
+					}
+
+					if (flag_left_align)
+					{
+						/* Padding with spaces */
+						if (width > str_length)
+						{
+							int padding = width - str_length;
+							while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
+							{
+								buffer[buffer_index++] = ' ';
+								count++;
+							}
+						}
+					}
+
+					break;
+				}
+				case 'd':
+				case 'i':
+				{
+					int num = va_arg(args, int);
+					int printed;
+					if (precision != -1)
+					{
+						printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+								   "%*.*d", width, precision, num);
+					}
+					else
+					{
+						if (flag_zero_padding)
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%0*d", width, num);
+						}
+						else
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%*d", width, num);
+						}
+					}
+					buffer_index += printed;
+					count += printed;
+					break;
+				}
+				case 'u':
+				{
+					unsigned int num = va_arg(args, unsigned int);
+					int printed;
+					if (precision != -1)
+					{
+						printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+								   "%*.*u", width, precision, num);
+					}
+					else
+					{
+						if (flag_zero_padding)
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%0*u", width, num);
+						}
+						else
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%*u", width, num);
+						}
+					}
+					buffer_index += printed;
+					count += printed;
+					break;
+				}
+				case 'o':
+				{
+					unsigned int num = va_arg(args, unsigned int);
+					int printed;
+					if (precision != -1)
+					{
+						printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+								   "%*.*o", width, precision, num);
+					}
+					else
+					{
+						if (flag_zero_padding)
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%0*o", width, num);
+						}
+						else
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%*o", width, num);
+						}
+					}
+					buffer_index += printed;
+					count += printed;
+					break;
+				}
+				case 'x':
+				{
+					unsigned int num = va_arg(args, unsigned int);
+					int printed;
+					if (precision != -1)
+					{
+						printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+								   "%*.*x", width, precision, num);
+					}
+					else
+					{
+						if (flag_zero_padding)
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%0*x", width, num);
+						}
+						else
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%*x", width, num);
+						}
+					}
+					buffer_index += printed;
+					count += printed;
+					break;
+				}
+				case 'X':
+				{
+					unsigned int num = va_arg(args, unsigned int);
+					int printed;
+					if (precision != -1)
+					{
+						printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+								   "%*.*X", width, precision, num);
+					}
+					else
+					{
+						if (flag_zero_padding)
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%0*X", width, num);
+						}
+						else
+						{
+							printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "%*X", width, num);
+						}
+					}
+					buffer_index += printed;
+					count += printed;
+					break;
+				}
+				case 'b':
+				{
+					unsigned int num = va_arg(args, unsigned int);
+					int printed;
+					if (precision != -1)
+					{
+						printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+								   "%*.*s", width, precision, decimal_to_binary(num));
+					}
+					else
+					{
+						printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+								   "%*s", width, decimal_to_binary(num));
+					}
+					buffer_index += printed;
+					count += printed;
+					break;
+				}
+				case 'S':
+				{
+					char *str = va_arg(args, char *);
+					if (str == NULL)
+						str = "(null)";
+
+					int str_length = strlen(str);
+					int available_space = sizeof(buffer) - buffer_index - 1;
+
+					if (!flag_left_align)
+					{
+						/* Padding with spaces */
+						if (width > str_length)
+						{
+							int padding = width - str_length;
+							while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
+							{
+								buffer[buffer_index++] = ' ';
+								count++;
+							}
+						}
+					}
+
+					for (int i = 0; i < str_length; i++)
+					{
+						if (str[i] > 0 && (str[i] < 32 || str[i] >= 127))
+						{
+							int printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+									   "\\x%02X", (unsigned char)str[i]);
+							buffer_index += printed;
+							count += printed;
+						}
+						else
+						{
+							buffer[buffer_index++] = str[i];
+							count++;
+						}
+					}
+
+					if (flag_left_align)
+					{
+						/* Padding with spaces */
+						if (width > str_length)
+						{
+							int padding = width - str_length;
+							while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
+							{
+								buffer[buffer_index++] = ' ';
+								count++;
+							}
+						}
+					}
+
+					break;
+				}
+				case 'p':
+				{
+					void *ptr = va_arg(args, void *);
+					int printed = snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index,
+							   "%#lx", (unsigned long)ptr);
+					buffer_index += printed;
+					count += printed;
+					break;
+				}
+				case 'r':
+				{
+					char *str = va_arg(args, char *);
+					if (str == NULL)
+						str = "(null)";
+
+					int str_length = strlen(str);
+					int available_space = sizeof(buffer) - buffer_index - 1;
+
+					if (!flag_left_align)
+					{
+						/* Padding with spaces */
+						if (width > str_length)
+						{
+							int padding = width - str_length;
+							while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
+							{
+								buffer[buffer_index++] = ' ';
+								count++;
+							}
+						}
+					}
+
+					for (int i = str_length - 1; i >= 0; i--)
+					{
+						buffer[buffer_index++] = str[i];
+						count++;
+					}
+
+					if (flag_left_align)
+					{
+						/* Padding with spaces */
+						if (width > str_length)
+						{
+							int padding = width - str_length;
+							while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
+							{
+								buffer[buffer_index++] = ' ';
+								count++;
+							}
+						}
+					}
+
+					break;
+				}
+				case 'R':
+				{
+					char *str = va_arg(args, char *);
+					if (str == NULL)
+						str = "(null)";
+
+					int str_length = strlen(str);
+					int available_space = sizeof(buffer) - buffer_index - 1;
+
+					if (!flag_left_align)
+					{
+						/* Padding with spaces */
+						if (width > str_length)
+						{
+							int padding = width - str_length;
+							while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
+							{
+								buffer[buffer_index++] = ' ';
+								count++;
+							}
+						}
+					}
+
+					for (int i = 0; i < str_length; i++)
+					{
+						if ((str[i] >= 'A' && str[i] <= 'M') || (str[i] >= 'a' && str[i] <= 'm'))
+							buffer[buffer_index++] = str[i] + 13;
+						else if ((str[i] >= 'N' && str[i] <= 'Z') || (str[i] >= 'n' && str[i] <= 'z'))
+							buffer[buffer_index++] = str[i] - 13;
+						else
+							buffer[buffer_index++] = str[i];
+						count++;
+					}
+
+					if (flag_left_align)
+					{
+						/* Padding with spaces */
+						if (width > str_length)
+						{
+							int padding = width - str_length;
+							while (padding-- > 0 && buffer_index < sizeof(buffer) - 1)
+							{
+								buffer[buffer_index++] = ' ';
+								count++;
+							}
+						}
+					}
+
+					break;
+					break;
+				}
+				default:
+				{
+					buffer[buffer_index++] = '%';
+					buffer[buffer_index++] = *format;
+					count += 2;
+					break;
+				}
+			}
+
+			format++;
+		}
+		else
+		{
+			buffer[buffer_index++] = *format;
+			count++;
+			format++;
+		}
+
+		if (buffer_index >= sizeof(buffer) - 1)
+		{
+			write(1, buffer, buffer_index);
+			buffer_index = 0;
+		}
+	}
+
+	va_end(args);
+
+	if (buffer_index > 0)
+		write(1, buffer, buffer_index);
+
+	return count;
 }
+
