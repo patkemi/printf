@@ -1,5 +1,11 @@
 #include <limits.h>
 #include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include "main.h"
 
 /**
