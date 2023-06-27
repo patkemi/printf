@@ -525,7 +525,6 @@ int _printf(const char *format, ...)
 		else
 		{
 			buffer[buffer_index++] = *format;
-			
 			count++;
 			format++;
 		}
