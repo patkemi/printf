@@ -18,8 +18,9 @@ int pat_handle_print(const char *fmt, int *ind, va_list list, char buffer[],
 	fmt_t fmt_types[] = {
 		{'c', pat_print_char}, {'s', pat_print_string}, {'%', pat_print_percent},
 		{'i', pat_print_int}, {'d', pat_print_int}, {'b', pat_print_binary},
-		{'u', pat_print_unsigned}, {'o', pat_print_octal}, {'x', pat_print_hexadecimal},
-		{'X', pat_print_hexa_upper}, {'p', pat_print_pointer}, {'S', pat_print_non_printable},
+		{'u', pat_print_unsigned}, {'o', pat_print_octal},
+		{'x', pat_print_hexadecimal}, {'X', pat_print_hexa_upper},
+		{'p', pat_print_pointer}, {'S', pat_print_non_printable},
 		{'r', pat_print_reverse}, {'R', pat_print_rot13string}, {'\0', NULL}
 	};
 	for (i = 0; fmt_types[i].fmt != '\0'; i++)
