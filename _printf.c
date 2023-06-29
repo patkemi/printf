@@ -48,13 +48,13 @@ else
 
 print_buffer(buffer, &buff_ind);
 
-flags = get_flags(format, &i);
+flags = pat_get_flags(format, &i);
 
-width = get_width(format, &i, list);
+width = pat_get_width(format, &i, list);
 
-precision = get_precision(format, &i, list);
+precision = pat_get_precision(format, &i, list);
 
-size = get_size(format, &i);
+size = pat_get_size(format, &i);
 
 ++i;
 

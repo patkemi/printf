@@ -58,7 +58,7 @@ int is_digit(char c)
  *
  * Return: Casted value of num
  */
-long int convert_size_number(long int num, int size)
+long int pat_convert_size_number(long int num, int size)
 {
 	if (size == S_LONG)
 		return (num);
@@ -75,7 +75,7 @@ long int convert_size_number(long int num, int size)
  *
  * Return: Casted value of num
  */
-long int convert_size_unsgnd(unsigned long int num, int size)
+long int pat_convert_size_unsignd(unsigned long int num, int size)
 {
 	if (size == S_LONG)
 		return (num);
