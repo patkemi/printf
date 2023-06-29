@@ -58,7 +58,7 @@ size = pat_get_size(format, &i);
 
 ++i;
 
-printed = handle_print(format, &i, list, buffer,
+printed = pat_handle_print(format, &i, list, buffer,
 
 flags, width, precision, size);
 
